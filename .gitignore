@@ -1,0 +1,6 @@
+env
+content
+.vscode
+__pycache__
+zips
+configs
