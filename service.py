@@ -9,7 +9,7 @@ import time
 last_day = ''
 this_day = ''
 
-import pdb; pdb.set_trace()
+#import pdb; pdb.set_trace()
 for i in range(1):
 #while True:
     now = datetime.datetime.now()
@@ -75,7 +75,7 @@ for i in range(1):
         print("no_new_article_today")
     print(this_day)
     last_day = this_day
-    time.sleep(43200)
+    time.sleep(432)
 
     
 

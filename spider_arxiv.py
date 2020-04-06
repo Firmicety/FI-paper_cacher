@@ -3,6 +3,7 @@ import time
 import os
 from components import TIMEOUT_COMMAND
 import json
+import random
 
 class Articles():
     def __init__(self, title, authors, areas, doi, date):
@@ -31,14 +32,14 @@ class Articles():
         path = path+"/%s.pdf"%self.title
         if not os.path.exists(path):
             cmd = 'curl %s -o %s --fail --silent --show-error'%(url, path)
-            result = TIMEOUT_COMMAND(cmd, 900)
+            result = TIMEOUT_COMMAND(cmd, 3600)
             if result:
                 self.path = path
-                print("%s succeed"%title)
+                print("%s succeed"%self.title)
             else:
                 if os.path.exists(path):
                     os.remove("%s"%path)
-                print("%s failed"%title)
+                print("%s failed"%self.title)
         else:
             self.path = path
     
@@ -127,24 +128,32 @@ class ArxivSpider():
 
     def getArxivArticle(self):       
         content_strhtml = {} 
+        all_areas = False
         import pdb; pdb.set_trace()
-        for area in self.areas:
-            time.sleep(2)
-            area_url = 'https://arxiv.org/list/%s/'%area + '/pastweek?skip=0&show=%s'
-            try:
-                init_strhtml = requests.get(area_url%'0').text
-                total_number = self.find_total_number(init_strhtml)
-                time.sleep(2)
-                content_strhtml[area] = requests.get(area_url%total_number).text
-                self.articles[area] = []
-                print("%s content get"%area)
-            except Exception as e:
-                print("Get Resource Error, area: %s"%area)
-        import pdb;pdb.set_trace()
-        for area in self.areas:
-            if area in self.articles:
-                self.articles[area] = self.find_this_week(content_strhtml[area])
-                print("%s articles info get"%area)
+        while not all_areas:
+            all_areas = True
+            for area in self.areas:
+                if area in content_strhtml:
+                    if content_strhtml[area] != []:
+                        continue
+
+                all_areas = False
+                time.sleep(random.random()*10)
+                area_url = 'https://arxiv.org/list/%s/'%area + '/pastweek?skip=0&show=%s'
+                try:
+                    init_strhtml = requests.get(area_url%'0').text
+                    total_number = self.find_total_number(init_strhtml)
+                    time.sleep(random.random()*10)
+                    content_strhtml[area] = requests.get(area_url%total_number).text
+                    self.articles[area] = []
+                    print("%s content get"%area)
+                except Exception as e:
+                    content_strhtml[area] = [] 
+                    print("Get Resource Error, area: %s"%area)
+            for area in self.areas:
+                if area in self.articles:
+                    self.articles[area] = self.find_this_week(content_strhtml[area])
+                    print("%s articles info get"%area)
         #for area_article_list in 
     
 
